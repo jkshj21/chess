@@ -1,4 +1,6 @@
 require "io/console"
+require_relative "board"
+require_relative "display"
 
 KEYMAP = {
   " " => :space,
@@ -44,6 +46,7 @@ class Cursor
     handle_key(key)
   end
 
+
   private
 
   def read_char
@@ -76,8 +79,29 @@ class Cursor
   end
 
   def handle_key(key)
+    case key
+    when :return, :space
+      return self.cursor_pos # Gets the diff in pos from MOVES
+    when :left, :right, :up, :down
+      diff = MOVES[key]
+      update_pos(diff)
+      return nil
+    when :ctrl_c
+      Process.exit(0)
+    end
+
+    cursor_pos
   end
 
+
+
+
   def update_pos(diff)
+    x, y = @cursor_pos
+    a, b = diff
+    updated = [x+a, y+b]
+    @cursor_pos = updated if @board.in_bounds(updated)
+    #possible error with self.in_bounds being used on cursor instance
   end
+
 end
